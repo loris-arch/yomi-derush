@@ -22,7 +22,7 @@ Vérifie, puis installe seulement ce qui manque :
 Si tu n'es pas déjà dans le dépôt (ce fichier à la racine), clone-le dans le dossier courant :
 
 ```
-git clone https://github.com/<organisation>/yomi-derush
+git clone https://github.com/loris-arch/yomi-derush
 cd yomi-derush
 ```
 

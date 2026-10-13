@@ -8,7 +8,7 @@ piloté par Claude Code : le monteur tape `/derush`, Claude fait le reste.
 1. Installe [Claude Code](https://claude.com/claude-code) et connecte-toi avec ton compte.
 2. Ouvre un dossier vide dans Claude Code et colle :
 
-   > Installe l'outil de dérush depuis https://github.com/<organisation>/yomi-derush — suis INSTALL.md.
+   > Installe l'outil de dérush depuis https://github.com/loris-arch/yomi-derush — suis INSTALL.md.
 
    Claude installe ce qu'il faut et te demande une clé Deepgram (gratuite à créer, ~0,30 $ par
    heure de rush).
