@@ -26,8 +26,9 @@ git clone https://github.com/<organisation>/yomi-derush
 cd yomi-derush
 ```
 
-Puis les dépendances : `npm install`. Vérifie : `npx tsc --noEmit` ne doit rien afficher, et
-`npm test` doit passer.
+Puis les dépendances : `npm install`. Deux avertissements `allow-scripts` (esbuild, fsevents)
+sont normaux : n'approuve rien, ça marche sans. Vérifie : `npx tsc --noEmit` ne doit rien
+afficher, et `npm test` doit passer.
 
 ## 3. La clé Deepgram
 
@@ -35,7 +36,8 @@ L'outil transcrit avec Deepgram (environ 0,30 $ par heure de rush). Il faut une 
 
 1. Demande à l'utilisateur s'il a déjà une clé. Sinon : compte sur https://console.deepgram.com
    (des crédits gratuits sont offerts), puis « API Keys » → « Create a New API Key ».
-2. Copie `.env.example` en `.env` et demande-lui de coller la clé dans `DEEPGRAM_API_KEY=`.
+2. Si `.env` existe déjà avec une clé, ne touche à rien. Sinon copie `.env.example` en `.env` et
+   demande-lui de coller la clé dans `DEEPGRAM_API_KEY=`.
    Si l'utilisateur te la donne en clair dans la conversation, écris-la dans `.env` sans la
    répéter dans tes réponses, et conseille-lui de la révoquer plus tard si la conversation
    est partagée.
@@ -43,26 +45,35 @@ L'outil transcrit avec Deepgram (environ 0,30 $ par heure de rush). Il faut une 
 
 ## 4. Test de bout en bout
 
-Demande un rush court à l'utilisateur, ou fabrique un extrait de 30 s depuis n'importe quelle
-vidéo qu'il a sous la main :
+Fabrique un extrait de 30 s depuis n'importe quelle vidéo parlée que l'utilisateur a sous la
+main (un rush brut de 60 Go convient : `-c copy` ne ré-encode pas, ça prend une seconde) :
 
 ```
 ffmpeg -y -ss 60 -t 30 -i <video> -c copy /tmp/extrait.mp4
 npx tsx src/cli/derush.ts /tmp/extrait.mp4 --name test --out /tmp/derush-test --prepare
 ```
 
-Tu dois obtenir `/tmp/derush-test/a-trancher.md` avec des phrases numérotées. Écris un
-`decision.json` minimal qui garde la première phrase, puis :
+Tu dois obtenir `/tmp/derush-test/a-trancher.md` avec des phrases numérotées (`A1`, `A2`…).
+Écris `/tmp/derush-test/decision.json` qui garde les deux premières :
+
+```json
+{ "keep": [{ "first": "A1", "last": "A2", "why": "", "alternates": [] }], "warnings": [], "missing": [] }
+```
+
+Puis :
 
 ```
 npx tsx src/cli/derush.ts /tmp/extrait.mp4 --name test --out /tmp/derush-test --reuse
 npx tsx src/cli/check.ts /tmp/derush-test
 ```
 
-Si `derush.xml` et `controle.md` existent, tout est en place. Dis à l'utilisateur :
+Si `derush.xml` et `controle.md` existent, tout est en place. Sur un test aussi court, un
+montage de quelques secondes et une « borne posée sans silence » sont normaux. Dis à
+l'utilisateur :
 
 > Prêt. Pour un tournage : ouvre ce dossier dans Claude Code et tape
-> `/derush <rush.mp4> --audio <son.wav>`.
+> `/derush <rush.mp4> --audio <son.wav>`. `--audio` est le wav de l'enregistreur, si le son a
+> été pris à part ; sans lui, l'outil utilise le son de la caméra.
 
 ## 5. Mises à jour
 

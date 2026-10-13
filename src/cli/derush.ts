@@ -409,7 +409,9 @@ async function main(): Promise<void> {
           );
         }
       }
-      console.log(`  … ${rushLetter(i)}  ${basename(path)}  ${clock(info.durationS)}  transcription (${asr})`);
+      const cached = await stat(join(transcriptsDir, `${basename(path)}${audioPath === path ? '' : '.sync'}.json`)).catch(() => null);
+      const how = cached !== null && !values.retranscribe ? 'transcript déjà fait, réutilisé' : `transcription (${asr})`;
+      console.log(`  … ${rushLetter(i)}  ${basename(path)}  ${clock(info.durationS)}  ${how}`);
       const transcript = await transcriptOf(path, info, transcriptsDir, values.retranscribe, asr, audioPath);
       const energy = await analyzeEnergy(audioPath, SILENCE_MIN_S);
       rushes.push({
